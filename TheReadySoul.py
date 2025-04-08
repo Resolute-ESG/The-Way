@@ -89,4 +89,7 @@ if st.button("Save Reflection"):
 # Regenerate Prompt
 st.markdown("---")
 if st.button("🔁 Regenerate Today's Prompt"):
-    st.experimental_rerun()
+    try:
+        st.experimental_rerun()
+    except Exception:
+        st.warning("Prompt regeneration failed. Please manually refresh the page.")
