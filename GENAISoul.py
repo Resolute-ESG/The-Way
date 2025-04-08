@@ -1,19 +1,20 @@
 import streamlit as st
 import openai
+from openai import OpenAI
 from datetime import datetime
 import os
 import json
 import calendar
 
 # Set your OpenAI API key securely (e.g. via environment variable)
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # File to store reflections in structured format
 REFLECTIONS_FILE = "reflections.json"
 
 def call_genai(prompt, system="You are a soulful guide helping users live with clarity and courage. Use poetic language."):
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": system},
@@ -21,7 +22,7 @@ def call_genai(prompt, system="You are a soulful guide helping users live with c
             ],
             temperature=0.8,
         )
-        return response['choices'][0]['message']['content'].strip()
+        return response.choices[0].message.content.strip()
     except Exception as e:
         return f"[Error generating response: {e}]"
 
