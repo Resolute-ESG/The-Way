@@ -2,19 +2,12 @@ import streamlit as st
 import openai
 from datetime import datetime
 import os
-import json
+import random
 
-# Set your OpenAI API key securely (e.g. via environment variable)
-openai.api_key = os.getenv("OPENAI_API_KEY")
-
-# Check for missing API key and display helpful error
-if not openai.api_key:
-    st.error("🔑 OpenAI API key is not set. Please add it to your environment or Streamlit secrets.")
-    st.stop()
+# Set your OpenAI API key from Streamlit secrets or environment variable
+openai.api_key = st.secrets.get("OPENAI_API_KEY", os.getenv("OPENAI_API_KEY"))
 
 # Fallback values from The Way of the Resolute
-from random import choice
-
 static_morning = [
     "Today, I open with calm and rise with quiet confidence.",
     "I begin with a soft heart and an anchored spirit.",
@@ -65,41 +58,40 @@ static_reflections = [
     "What did I learn by not reacting?"
 ]
 
-def call_genai(prompt, system="You are a soulful guide helping users live with clarity and courage. Use poetic language."):
+def call_genai(prompt, fallback_list):
     try:
         response = openai.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": system},
+                {"role": "system", "content": "You are a soulful, poetic guide speaking in the voice of 'The Way of the Resolute'."},
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.8,
+            temperature=0.85,
         )
         return response.choices[0].message.content.strip()
-    except Exception:
-        return None
+    except:
+        return random.choice(fallback_list)
 
 def generate_prompt():
     today = datetime.today().strftime('%Y-%m-%d')
-    morning = call_genai("Write a short morning intention in the voice of 'The Way of the Resolute'.") or choice(static_morning)
-    mantra = call_genai("Create a poetic, one-sentence mantra in the tone of 'The Way of the Resolute'.") or choice(static_mantras)
-    action = call_genai("Suggest one small, soul-aligned action someone can take today.") or choice(static_actions)
-    reflection = call_genai("Offer an evening reflection question.") or choice(static_reflections)
     return {
         "date": today,
-        "morning_intention": morning,
-        "mantra": mantra,
-        "aligned_action": action,
-        "evening_reflection": reflection
+        "morning_intention": call_genai("Write a short morning intention in the voice of the Way of the Resolute.", static_morning),
+        "mantra": call_genai("Write a soulful, poetic mantra aligned with the voice of the Way of the Resolute.", static_mantras),
+        "aligned_action": call_genai("Suggest one small action that would align someone with truth, soul and simplicity.", static_actions),
+        "evening_reflection": call_genai("Write a single evening reflection question to reconnect with purpose and inner truth.", static_reflections)
     }
 
 # Streamlit UI
 st.set_page_config(page_title="The Ready Soul", layout="centered")
 st.title("🌿 The Ready Soul – Daily Manifestation")
 
-st.markdown("---")
-prompt = generate_prompt()
+if st.button("🔄 Regenerate Daily Guidance") or "prompt" not in st.session_state:
+    st.session_state.prompt = generate_prompt()
 
+prompt = st.session_state.prompt
+
+st.markdown("---")
 st.subheader(f"🗓️ Daily Guidance – {prompt['date']}")
 st.markdown(f"**🌞 Morning Intention:** {prompt['morning_intention']}")
 st.markdown(f"**🔮 Mantra:** {prompt['mantra']}")
@@ -107,4 +99,4 @@ st.markdown(f"**🌱 Aligned Action:** {prompt['aligned_action']}")
 st.markdown(f"**🌙 Evening Reflection:** {prompt['evening_reflection']}")
 
 st.markdown("---")
-st.info("📝 Reflections are now local only and will not be stored or recalled. For privacy and simplicity, journaling is a personal practice in the moment.")
+st.info("This guidance is drawn from GenAI in the spirit of The Way of the Resolute. If unavailable, it draws from a curated archive of your personal journey.")
