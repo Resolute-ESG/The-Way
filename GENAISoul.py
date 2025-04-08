@@ -84,7 +84,7 @@ def generate_prompt():
 
 # Streamlit UI
 st.set_page_config(page_title="The Ready Soul", layout="centered")
-st.title("🌿 The Ready Soul – Daily Manifestation")
+st.title("🌿 The Ready Soul 🌿")
 
 if st.button("🔄 Regenerate Daily Guidance") or "prompt" not in st.session_state:
     if "prompt" in st.session_state:
