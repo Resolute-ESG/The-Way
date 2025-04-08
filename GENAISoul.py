@@ -28,21 +28,75 @@ def call_genai(prompt, system="You are a soulful guide helping users live with c
 def generate_prompt():
     today = datetime.today().strftime('%Y-%m-%d')
 
-    morning = call_genai(
-        "Write a short morning intention in the voice of 'The Way of the Resolute'—calm, clear, and focused on soul alignment."
-    )
+    try:
+        morning = call_genai(
+            "Write a short morning intention in the voice of 'The Way of the Resolute'—calm, clear, and focused on soul alignment."
+        )
 
-    mantra = call_genai(
-        "Create a poetic, one-sentence mantra in the tone of 'The Way of the Resolute'. Must feel spiritual and grounded."
-    )
+        mantra = call_genai(
+            "Create a poetic, one-sentence mantra in the tone of 'The Way of the Resolute'. Must feel spiritual and grounded."
+        )
 
-    action = call_genai(
-        "Suggest one small, soul-aligned action someone can take today to feel empowered and present. Write in an inspiring tone."
-    )
+        action = call_genai(
+            "Suggest one small, soul-aligned action someone can take today to feel empowered and present. Write in an inspiring tone."
+        )
 
-    reflection = call_genai(
-        "Offer a single evening reflection question that helps someone reconnect with themselves after a long day."
-    )
+        reflection = call_genai(
+            "Offer a single evening reflection question that helps someone reconnect with themselves after a long day."
+        )
+
+        # Check for fallback trigger
+        if '[Error' in morning or '[Error' in mantra or '[Error' in action or '[Error' in reflection:
+            raise Exception("Fallback to static prompts")
+
+    except Exception:
+        # Fallback values drawn from previously generated Way of the Resolute prompts
+        from random import choice
+
+        static_morning = [
+            "Today, I open with calm and rise with quiet confidence.",
+            "I begin with a soft heart and an anchored spirit.",
+            "I walk through this day with reverence and resolve.",
+            "I rise in peace, not perfection.",
+            "Today, I move with the grace of one who has already returned home.",
+            "I don’t chase. I allow. I receive.",
+            "This day does not own me—I move through it with quiet strength."
+        ]
+
+        static_mantras = [
+            "I align with the power of Source. I am receiving. I am home.",
+            "With every breath, I rise into who I was meant to be.",
+            "Stillness is my power, truth is my direction.",
+            "I am not striving—I am returning.",
+            "What is for me already knows my name.",
+            "My grounded presence is my greatest strength.",
+            "I will not shrink—I was born to expand."
+        ]
+
+        static_actions = [
+            "Speak one truth you've been holding inside.",
+            "Create a sacred pause in your schedule today.",
+            "Offer a word of kindness, even if unspoken aloud.",
+            "Write a single sentence that reminds you who you are.",
+            "Make one decision today from your higher self, not your habits.",
+            "Breathe deeply before responding—choose intention over reaction.",
+            "Say no without guilt, yes without fear."
+        ]
+
+        static_reflections = [
+            "Where did I move from love today?",
+            "What did I release that no longer served me?",
+            "Did I show up in alignment with my deepest values?",
+            "Where did I feel most myself?",
+            "What moment reminded me of my strength?",
+            "What am I still carrying that I can now set down?",
+            "Did I honour my boundaries and my breath today?"
+        ]
+
+        morning = choice(static_morning)
+        mantra = choice(static_mantras)
+        action = choice(static_actions)
+        reflection = choice(static_reflections)
 
     return {
         "date": today,
