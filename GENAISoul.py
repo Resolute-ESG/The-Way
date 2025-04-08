@@ -14,7 +14,7 @@ REFLECTIONS_FILE = "reflections.json"
 def call_genai(prompt, system="You are a soulful guide helping users live with clarity and courage. Use poetic language."):
     try:
         response = openai.chat.completions.create(
-            model="gpt-4",
+            model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": system},
                 {"role": "user", "content": prompt}
