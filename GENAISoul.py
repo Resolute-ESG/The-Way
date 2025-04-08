@@ -101,4 +101,4 @@ st.markdown(f"**🌱 Aligned Action:** {prompt['aligned_action']}")
 st.markdown(f"**🌙 Evening Reflection:** {prompt['evening_reflection']}")
 
 st.markdown("---")
-st.info("This guidance is drawn from the spirit of The Way of the Resolute.")
+st.info("This guidance is drawn from the spirit of The Way of the Resolute. [Follow us on LinkedIn](https://www.linkedin.com/company/the-way-of-the-resolute)")
