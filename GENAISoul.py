@@ -1,6 +1,7 @@
 import streamlit as st
 import random
 from datetime import datetime
+import os
 
 # Sample content pools
 morning_intentions = [
@@ -57,6 +58,14 @@ def generate_prompt():
         "evening_reflection": random.choice(evening_reflections)
     }
 
+# Load reflections from file
+def load_reflections():
+    if os.path.exists("reflections.txt"):
+        with open("reflections.txt", "r") as file:
+            data = file.read().strip()
+        return data.split("\n\n") if data else []
+    return []
+
 # Streamlit UI
 st.set_page_config(page_title="The Ready Soul", layout="centered")
 st.title("🌿 The Ready Soul – Daily Manifestation")
@@ -81,10 +90,23 @@ journal_entry = st.text_area("Write your thoughts, intentions, or reflections he
 if st.button("Save Reflection"):
     if journal_entry.strip():
         with open("reflections.txt", "a") as file:
-            file.write(f"\n[{prompt['date']}]\n{journal_entry}\n")
+            file.write(f"\n\n[{prompt['date']}]\n{journal_entry}")
         st.success("Reflection saved.")
     else:
         st.warning("Please write something before saving.")
+
+# Calendar-style Reflection Viewer
+st.markdown("---")
+st.subheader("🗓️ View Past Reflections")
+reflections = load_reflections()
+if reflections:
+    dates = [r.split("\n")[0].strip("[]") for r in reflections if r.strip()]
+    selected_date = st.selectbox("Select a date to view your reflection:", dates)
+    for reflection in reflections:
+        if reflection.startswith(f"[{selected_date}]"):
+            st.text_area("Reflection on " + selected_date, value=reflection.split("\n", 1)[1].strip(), height=200, disabled=True)
+else:
+    st.info("No reflections saved yet. Start by writing your first one today!")
 
 # Regenerate Prompt
 st.markdown("---")
@@ -92,4 +114,4 @@ if st.button("🔁 Regenerate Today's Prompt"):
     try:
         st.experimental_rerun()
     except Exception:
-        st.warning("New Soul Guides have been generated to support your Journey.")
+        st.warning("New Soul Guides have been generated to support your Journey. review your Reflections in the Calendar")
