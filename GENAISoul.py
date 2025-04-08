@@ -1,70 +1,68 @@
 import streamlit as st
-import random
+import openai
 from datetime import datetime
 import os
+import json
+import calendar
 
-# Sample content pools
-morning_intentions = [
-    "Today, I walk in alignment. I choose clarity, lead with kindness, welcome fun, and trust my path.",
-    "I begin this day open to the magic of becoming. I choose to respond, not react.",
-    "My energy is sacred. I move only in ways that honor my becoming."
-]
+# Set your OpenAI API key securely (e.g. via environment variable)
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
-aligned_actions = [
-    "Say no to something that no longer feels aligned.",
-    "Do one thing just for fun—sing, dance, laugh.",
-    "Reach out to someone who brings light into your life."
-]
+# File to store reflections in structured format
+REFLECTIONS_FILE = "reflections.json"
 
-evening_reflections = [
-    "Where did I feel most like myself today?",
-    "What small moment brought me joy today?",
-    "Did I choose courage over comfort today?"
-]
+def call_genai(prompt, system="You are a soulful guide helping users live with clarity and courage. Use poetic language."):
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.8,
+        )
+        return response['choices'][0]['message']['content'].strip()
+    except Exception as e:
+        return f"[Error generating response: {e}]"
 
-# Modular mantra generation
-mantra_starts = [
-    "Today, I rise in",
-    "With every breath, I embrace",
-    "I align myself with",
-    "I choose to walk in"
-]
-
-mantra_themes = [
-    "clarity and calm",
-    "the sacred rhythm of becoming",
-    "truth over noise",
-    "kindness, courage, and peace",
-    "the quiet strength within me"
-]
-
-mantra_ends = [
-    "because I was always meant for this.",
-    "as a warrior of light.",
-    "in reverence to who I am becoming.",
-    "with trust, not tension."
-]
-
-def generate_mantra():
-    return f"{random.choice(mantra_starts)} {random.choice(mantra_themes)} {random.choice(mantra_ends)}"
-
-# Generate a daily prompt
 def generate_prompt():
+    today = datetime.today().strftime('%Y-%m-%d')
+
+    morning = call_genai(
+        "Write a short morning intention in the voice of 'The Way of the Resolute'—calm, clear, and focused on soul alignment."
+    )
+
+    mantra = call_genai(
+        "Create a poetic, one-sentence mantra in the tone of 'The Way of the Resolute'. Must feel spiritual and grounded."
+    )
+
+    action = call_genai(
+        "Suggest one small, soul-aligned action someone can take today to feel empowered and present. Write in an inspiring tone."
+    )
+
+    reflection = call_genai(
+        "Offer a single evening reflection question that helps someone reconnect with themselves after a long day."
+    )
+
     return {
-        "date": datetime.today().strftime('%Y-%m-%d'),
-        "morning_intention": random.choice(morning_intentions),
-        "mantra": generate_mantra(),
-        "aligned_action": random.choice(aligned_actions),
-        "evening_reflection": random.choice(evening_reflections)
+        "date": today,
+        "morning_intention": morning,
+        "mantra": mantra,
+        "aligned_action": action,
+        "evening_reflection": reflection
     }
 
-# Load reflections from file
-def load_reflections():
-    if os.path.exists("reflections.txt"):
-        with open("reflections.txt", "r") as file:
-            data = file.read().strip()
-        return data.split("\n\n") if data else []
-    return []
+def save_reflection(date, content):
+    reflections = load_all_reflections()
+    reflections[date] = content
+    with open(REFLECTIONS_FILE, "w") as f:
+        json.dump(reflections, f, indent=4)
+
+def load_all_reflections():
+    if os.path.exists(REFLECTIONS_FILE):
+        with open(REFLECTIONS_FILE, "r") as f:
+            return json.load(f)
+    return {}
 
 # Streamlit UI
 st.set_page_config(page_title="The Ready Soul", layout="centered")
@@ -79,7 +77,7 @@ st.subheader(f"🗓️ Daily Guidance – {prompt['date']}")
 st.markdown(f"**🌞 Morning Intention:** {prompt['morning_intention']}")
 st.markdown(f"**🔮 Mantra:** {prompt['mantra']}")
 st.markdown(f"**🌱 Aligned Action:** {prompt['aligned_action']}")
-st.markdown(f"**🌙 Evening Reflection:** {prompt['evening_reflection']}")
+st.markdown(f"**🌙 Evening Reflection:** {prompt['evening_reflection']}\n")
 
 # Journaling Section
 st.markdown("---")
@@ -89,22 +87,27 @@ journal_entry = st.text_area("Write your thoughts, intentions, or reflections he
 
 if st.button("Save Reflection"):
     if journal_entry.strip():
-        with open("reflections.txt", "a") as file:
-            file.write(f"\n\n[{prompt['date']}]\n{journal_entry}")
+        save_reflection(prompt['date'], journal_entry.strip())
         st.success("Reflection saved.")
     else:
         st.warning("Please write something before saving.")
 
-# Calendar-style Reflection Viewer
+# Calendar-style Reflection Viewer with edit option
 st.markdown("---")
-st.subheader("🗓️ View Past Reflections")
-reflections = load_reflections()
-if reflections:
-    dates = [r.split("\n")[0].strip("[]") for r in reflections if r.strip()]
-    selected_date = st.selectbox("Select a date to view your reflection:", dates)
-    for reflection in reflections:
-        if reflection.startswith(f"[{selected_date}]"):
-            st.text_area("Reflection on " + selected_date, value=reflection.split("\n", 1)[1].strip(), height=200, disabled=True)
+st.subheader("📅 Calendar View: Review & Edit Reflections")
+all_reflections = load_all_reflections()
+if all_reflections:
+    dates = sorted(all_reflections.keys(), reverse=True)
+    selected_date = st.date_input("Select a date to view or edit:", datetime.today())
+    selected_str = selected_date.strftime('%Y-%m-%d')
+
+    if selected_str in all_reflections:
+        edited_entry = st.text_area(f"Reflection on {selected_str}", value=all_reflections[selected_str], height=200)
+        if st.button("Update Reflection"):
+            save_reflection(selected_str, edited_entry.strip())
+            st.success("Reflection updated.")
+    else:
+        st.info("No reflection saved for this date.")
 else:
     st.info("No reflections saved yet. Start by writing your first one today!")
 
@@ -114,4 +117,4 @@ if st.button("🔁 Regenerate Today's Prompt"):
     try:
         st.experimental_rerun()
     except Exception:
-        st.warning("New Soul Guides have been generated to support your Journey. review your Reflections in the Calendar")
+        st.warning("New Soul Guides have been generated to support your Journey.")
