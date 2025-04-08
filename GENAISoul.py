@@ -171,5 +171,5 @@ if st.button("🔁 Regenerate Today's Prompt"):
     try:
         st.experimental_rerun()
     except Exception:
-        st.warning("Scroll to the Top to see your new 🌞 Morning Intention: 🔮 Mantra: 🌱 Aligned Action: 
+        st.warning("Regenerated Scroll to the Top to see your new 🌞 Morning Intention: 🔮 Mantra: 🌱 Aligned Action: 
 🌙 Evening Reflection:")
