@@ -8,6 +8,11 @@ import calendar
 # Set your OpenAI API key securely (e.g. via environment variable)
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
+# Check for missing API key and display helpful error
+if not openai.api_key:
+    st.error("🔑 OpenAI API key is not set. Please add it to your environment or Streamlit secrets.")
+    st.stop()
+
 # File to store reflections in structured format
 REFLECTIONS_FILE = "reflections.json"
 
