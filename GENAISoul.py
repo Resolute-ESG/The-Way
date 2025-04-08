@@ -87,6 +87,8 @@ st.set_page_config(page_title="The Ready Soul", layout="centered")
 st.title("🌿 The Ready Soul – Daily Manifestation")
 
 if st.button("🔄 Regenerate Daily Guidance") or "prompt" not in st.session_state:
+    if "prompt" in st.session_state:
+        st.success("Your Guidance has been regenerated")
     st.session_state.prompt = generate_prompt()
 
 prompt = st.session_state.prompt
@@ -99,4 +101,4 @@ st.markdown(f"**🌱 Aligned Action:** {prompt['aligned_action']}")
 st.markdown(f"**🌙 Evening Reflection:** {prompt['evening_reflection']}")
 
 st.markdown("---")
-st.info("This guidance is drawn from GenAI in the spirit of The Way of the Resolute. If unavailable, it draws from a curated archive of your personal journey.")
+st.info("This guidance is drawn from the spirit of The Way of the Resolute.")
