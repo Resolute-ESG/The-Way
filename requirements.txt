@@ -2,3 +2,4 @@ streamlit
 openai
 supabase-py
 python-dotenv
+pandas
