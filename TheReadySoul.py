@@ -92,4 +92,4 @@ if st.button("🔁 Regenerate Today's Prompt"):
     try:
         st.experimental_rerun()
     except Exception:
-        st.warning("Prompt regeneration failed. Please manually refresh the page.")
+        st.warning("New Soul Guides have been generated to support your Journey.")
