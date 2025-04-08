@@ -1,5 +1,5 @@
 import streamlit as st
-from supabase import create_client, Client
+from supabase_py import create_client
 from datetime import datetime
 import os
 from dotenv import load_dotenv
@@ -10,7 +10,7 @@ SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 # Connect to Supabase
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # Session management (simplified for Streamlit)
 if "user" not in st.session_state:
@@ -18,16 +18,16 @@ if "user" not in st.session_state:
 
 def signup(email, password):
     try:
-        result = supabase.auth.sign_up({"email": email, "password": password})
-        return result.user
+        result = supabase.auth.sign_up(email=email, password=password)
+        return result["user"]
     except Exception as e:
         st.error(f"Signup failed: {e}")
         return None
 
 def login(email, password):
     try:
-        result = supabase.auth.sign_in_with_password({"email": email, "password": password})
-        return result.user
+        result = supabase.auth.sign_in(email=email, password=password)
+        return result["user"]
     except Exception as e:
         st.error(f"Login failed: {e}")
         return None
@@ -62,7 +62,7 @@ if not st.session_state.user:
             st.success("Logged in successfully!")
             st.experimental_rerun()
 else:
-    st.success(f"Welcome, {st.session_state.user.email}")
+    st.success(f"Welcome, {st.session_state.user['email']}")
     st.markdown("---")
 
     # Reflections UI
@@ -71,19 +71,19 @@ else:
     entry = st.text_area("Write your thoughts for today:")
 
     if st.button("Save Today's Reflection"):
-        save_reflection(st.session_state.user.id, today, entry)
+        save_reflection(st.session_state.user["id"], today, entry)
         st.success("Reflection saved.")
 
     st.markdown("---")
     st.subheader("📅 View Past Reflections")
-    reflections = get_user_reflections(st.session_state.user.id)
+    reflections = get_user_reflections(st.session_state.user["id"])
     if reflections:
         date_options = [r["date"] for r in reflections]
         selected_date = st.selectbox("Select a date", date_options[::-1])
         selected = next(r for r in reflections if r["date"] == selected_date)
         updated_entry = st.text_area("Edit Reflection", selected["reflection"])
         if st.button("Update Reflection"):
-            save_reflection(st.session_state.user.id, selected_date, updated_entry)
+            save_reflection(st.session_state.user["id"], selected_date, updated_entry)
             st.success("Reflection updated.")
     else:
         st.info("No reflections yet. Start journaling today!")
