@@ -171,4 +171,5 @@ if st.button("🔁 Regenerate Today's Prompt"):
     try:
         st.experimental_rerun()
     except Exception:
-        st.warning("New Soul Guides have been generated to support your Journey.")
+        st.warning("Scroll to the Top to see your new 🌞 Morning Intention: 🔮 Mantra: 🌱 Aligned Action: 
+🌙 Evening Reflection:")
