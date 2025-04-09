@@ -1,4 +1,4 @@
-mport streamlit as st
+import streamlit as st
 import openai
 from datetime import datetime
 import os
@@ -84,7 +84,7 @@ def generate_prompt():
 
 # Streamlit UI
 st.set_page_config(page_title="The Ready Soul", layout="centered")
-st.image("/mnt/data/image.png", use_column_width=True)
+st.image("https://the-way-banner.streamlit.app/the_way_banner.png", use_column_width=True)
 st.title("🌿 The Ready Soul 🌿")
 
 if st.button("🔄 Regenerate Daily Guidance") or "prompt" not in st.session_state:
@@ -101,4 +101,4 @@ st.markdown(f"**🌱 Aligned Action:** {prompt['aligned_action']}")
 st.markdown(f"**🌙 Evening Reflection:** {prompt['evening_reflection']}")
 
 st.markdown("---")
-st.info("This guidance is drawn from the spirit of The Way of the Resolute. [Follow us on LinkedIn](https://www.linkedin.com/in/the-way-of-the-resolute)")
+st.info("This guidance is drawn from the publications and philosophy of The Way of the Resolute. [Follow us on LinkedIn](https://www.linkedin.com/in/the-way-of-the-resolute)")
