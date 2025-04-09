@@ -88,8 +88,7 @@ st.image("https://raw.githubusercontent.com/the-way-of-the-resolute/assets/main/
 st.title("🌿 The Ready Soul 🌿")
 
 if st.button("🔄 Regenerate Daily Guidance") or "prompt" not in st.session_state:
-    if "prompt" in st.session_state:
-        st.success("Your Guidance has been regenerated")
+    st.info("Your guide is regenerating now...")
     st.session_state.prompt = generate_prompt()
 
 prompt = st.session_state.prompt
@@ -102,5 +101,4 @@ st.markdown(f"**🌱 Aligned Action:** {prompt['aligned_action']}")
 st.markdown(f"**🌙 Evening Reflection:** {prompt['evening_reflection']}")
 
 st.markdown("---")
-st.info("This guidance is drawn from the spirit of The Way of the Resolute. [Follow us on LinkedIn](https://www.linkedin.com/in/the-way-of-the-resolute)")
-
+st.info("This guidance is drawn from the spirit of The Way of the Resolute. [Follow us on LinkedIn](https://www.linkedin.com/in/the-way-of-the-resolute)")")
