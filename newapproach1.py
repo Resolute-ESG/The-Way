@@ -84,7 +84,7 @@ def generate_prompt():
 
 # Streamlit UI
 st.set_page_config(page_title="The Ready Soul", layout="centered")
-st.image("https://the-way-banner.streamlit.app/the_way_banner.png", use_column_width=True)
+st.image("https://the-way-banner.streamlit.app/the_way_banner.png", use_container_width=True)
 st.title("🌿 The Ready Soul 🌿")
 
 if st.button("🔄 Regenerate Daily Guidance") or "prompt" not in st.session_state:
